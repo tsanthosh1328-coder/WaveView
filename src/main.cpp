@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <esp_adc_cal.h>
 
 #define ADC_PIN        34
 #define BAUD_RATE      115200
@@ -11,6 +12,7 @@
 volatile bool shouldSample = false;
 uint16_t buffer[BUFFER_SIZE];
 int bufferIndex = 0;
+esp_adc_cal_characteristics_t adc_chars;
 
 hw_timer_t* timer = NULL;
 
@@ -48,12 +50,14 @@ void setup() {
     timer = timerBegin(SAMPLE_RATE);
     timerAttachInterrupt(timer, &onTimer);
     timerAlarm(timer, 1, true, 0);
+    esp_adc_cal_characterize(ADC_UNIT_1, ADC_ATTEN_DB_11, ADC_WIDTH_BIT_12, 1100, &adc_chars);
 }
 
 void loop() {
     if (shouldSample) {
         shouldSample = false;
-        buffer[bufferIndex++] = (uint16_t)analogRead(ADC_PIN);
+        uint32_t voltage_mv = esp_adc_cal_raw_to_voltage(analogRead(ADC_PIN), &adc_chars);
+        buffer[bufferIndex++] = (uint16_t)(voltage_mv * 4095 / 3300);
 
         if (bufferIndex >= BUFFER_SIZE) {
             sendPacket(buffer, BUFFER_SIZE);

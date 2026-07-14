@@ -38,29 +38,14 @@ Sample signals at 10kHz, measure PWM, audio, and sensor outputs — all from you
 | ESP32 DevKit | — | ADC sampling + USB serial |
 | Resistor R1 | 4.1kΩ | Voltage divider input |
 | Resistor R2a + R2b | 4.1kΩ + 4.1kΩ (8.2kΩ total) | Voltage divider output |
+| Resistor Rout | 1kΩ | 
 | Diode D1 | 1N4148 | Clamp to 3.3V |
 | Diode D2 | 1N4148 | Clamp to GND |
 | Perfboard | 8×12cm | Circuit board |
 
 ### Input Protection Circuit
 
-```
-Signal Input
-     │
-    R1 (4.1kΩ)
-     │
-     ├──── D1 cathode → 3.3V
-     ├──── D2 anode  → GND
-     ├──── R2a (4.1kΩ) + R2b (4.1kΩ) → GND
-     │
-    GPIO34 (ESP32 ADC)
-```
-
-**Voltage scaling:**
-
-- 5V input → 3.24V at GPIO34 ✅
-- 3.3V input → 2.14V at GPIO34 ✅
-- Input safely clamped by D1/D2
+![Schematic](schematic.png)
 
 ---
 
@@ -118,16 +103,12 @@ source venv/bin/activate
 pip install pyqtgraph pyqt5 pyserial numpy
 ```
 
-> **Windows:** use `venv\Scripts\activate` instead.
-
 ### 4. Run WaveView
 
 ```bash
+source venv/bin/activate
 python3 waveview.py
 ```
-
-> **Note:** Default serial port is `/dev/ttyUSB0`. Edit `PORT` in `waveview.py` if your port differs (e.g. `/dev/ttyACM0` on some Linux systems, `COM3` on Windows).
-
 ---
 
 ## Signal Compatibility
@@ -140,21 +121,6 @@ python3 waveview.py
 | Logic signals | ✅ | Up to 5V |
 | Signals above 5V | ❌ | Not supported — hardware limit |
 | Negative voltages | ❌ | Clamped to 0V by D2 |
-
----
-
-## Project Structure
-
-```
-WaveView/
-├── src/
-│   └── main.cpp        # ESP32 firmware (timer ISR, ADC, packet protocol)
-├── waveview.py         # Python GUI (PyQtGraph, serial reader, measurements)
-├── platformio.ini      # PlatformIO build config
-├── .gitignore
-├── LICENSE
-└── README.md
-```
 
 ---
 

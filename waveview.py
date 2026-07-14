@@ -14,7 +14,9 @@ SAMPLE_RATE    = 10000
 BUFFER_SIZE    = 256
 VREF           = 3.3
 ADC_MAX        = 4095
-
+CAL_A          = 1.25
+CAL_B          = -0.9025
+DIVIDER_RATIO  = 0.667  
 HISTORY_SIZE   = SAMPLE_RATE * 5
 SYNC_A = 0xAA
 SYNC_B = 0x55
@@ -76,7 +78,7 @@ def serial_thread_func():
         while True:
             samples = read_packet(ser)
             if samples:
-                voltage = [(s / ADC_MAX) * VREF for s in samples]
+                voltage = [CAL_A * (s / ADC_MAX) * (VREF / DIVIDER_RATIO) + CAL_B for s in samples]
                 if not data_queue.full():
                     data_queue.put(voltage)
 
@@ -214,7 +216,7 @@ class Oscilloscope(QtWidgets.QMainWindow):
 
         self.plot_widget.setLabel("left",   "Voltage", units="V")
         self.plot_widget.setLabel("bottom", "Time",    units="ms")
-        self.plot_widget.setYRange(-0.1, VREF + 0.3, padding=0)
+        self.plot_widget.setYRange(-0.1, 5.1, padding=0)
         self.plot_widget.showGrid(x=True, y=True, alpha=0.3)
         self.plot_widget.setMouseEnabled(x=False, y=False)
 
