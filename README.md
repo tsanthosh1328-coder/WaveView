@@ -38,14 +38,14 @@ Sample signals at 10kHz, measure PWM, audio, and sensor outputs — all from you
 | ESP32 DevKit | — | ADC sampling + USB serial |
 | Resistor R1 | 4.1kΩ | Voltage divider input |
 | Resistor R2a + R2b | 4.1kΩ + 4.1kΩ (8.2kΩ total) | Voltage divider output |
-| Resistor Rout | 1kΩ | 
+| Resistor Rout | 1kΩ | Output current limiter (protects GPIO34) |
 | Diode D1 | 1N4148 | Clamp to 3.3V |
 | Diode D2 | 1N4148 | Clamp to GND |
 | Perfboard | 8×12cm | Circuit board |
 
 ### Input Protection Circuit
 
-![Schematic](schematic.png)
+<img src="schematic.png" alt="Schematic" width="400"/>
 
 ---
 
